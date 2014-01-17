@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.hamcrest</groupId>
+	<artifactId>hamcrest-generator</artifactId>
+	<version>1.2</version>
+	<packaging>jar</packaging>
+
+	<name>Hamcrest generator</name>
+
+	<description>
+		A tool to allow many Matcher implementations to be
+	   	combined into a single class so users don't have to
+	   	remember many classes/packages to import. Generates
+	   	code.
+   </description>
+
+	<url>http://code.google.com/p/hamcrest/</url>
+
+	<licenses>
+		<license>
+			<name>New BSD License</name>
+			<url>http://www.opensource.org/licenses/bsd-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>http://code.google.com/p/hamcrest/source/browse/</url>
+		<connection>http://hamcrest.googlecode.com/svn/trunk/hamcrest-generator</connection>
+	</scm>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>qdox</groupId>
+			<artifactId>qdox</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+	
+		<resources>
+			<resource>
+				<directory>..</directory>
+				<includes>
+					<include>LICENSE.txt</include>
+				</includes>
+			</resource>
+		</resources>
+	
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<testExcludes>
+						<exclude>org/hamcrest/generator/apt/AptOptionsTest.java</exclude>
+						<exclude>org/hamcrest/generator/config/XmlConfiguratorTest.java</exclude>
+					</testExcludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>default-tools.jar</id>
+			<activation>
+				<property>
+					<name>java.vendor</name>
+					<value>Sun Microsystems Inc.</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.sun</groupId>
+					<artifactId>tools</artifactId>
+					<version>1.5.0</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/../lib/tools.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+</project>
