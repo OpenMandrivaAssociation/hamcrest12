@@ -3,9 +3,10 @@
 
 Name:           hamcrest12
 Version:        1.2
-Release:        7.0%{?dist}
+Release:        9.1
 Epoch:          0
 Summary:        Library of matchers for building test expressions
+Group:		Development/Java
 License:        BSD
 URL:            http://code.google.com/p/hamcrest/
 
@@ -14,22 +15,22 @@ Source1:        http://repo1.maven.org/maven2/org/hamcrest/hamcrest-library/1.2/
 Source2:        http://repo1.maven.org/maven2/org/hamcrest/hamcrest-generator/1.2/hamcrest-generator-1.2.pom
 Source3:        http://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.2/hamcrest-core-1.2.pom
 Source4:        hamcrest-all-1.2.pom
-Source5:        hamcrest-core-MANIFEST.MF
 Patch0:         hamcrest-1.1-build.patch
 Patch1:         hamcrest-1.1-no-jarjar.patch
 Patch2:         hamcrest-1.1-no-integration.patch
 Patch3:         hamcrest1.2-build.patch
-Requires:       java >= 1:1.6.0
+Patch4:		hamcrest-qdox2.0.patch
 Requires:       easymock3
 Requires:       qdox
-BuildRequires:  jpackage-utils >= 0:1.7.4
-BuildRequires:  java-devel >= 1:1.6.0
-BuildRequires:  ant >= 0:1.6.5
+BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  zip
 BuildRequires:  easymock3
 BuildRequires:  junit
 BuildRequires:  qdox
+BuildRequires:	maven-local
+
+Requires:	java-headless
 
 BuildArch:      noarch
 
@@ -40,10 +41,8 @@ frameworks. Typical scenarios include testing frameworks, mocking libraries and
 UI validation rules.
 
 %package javadoc
-
+Group:		Documentation
 Summary:        API documentation for %{name}
-BuildArch:      noarch
-Requires:       jpackage-utils
 
 %description javadoc
 API documentation for %{name}.
@@ -56,6 +55,9 @@ ln -sf $(build-classpath qdox) lib/generator/
 %patch1 -p1
 %patch2 -p0
 %patch3 -p1
+%patch4 -p1
+
+%mvn_compat_version : 1.2
 
 perl -pi -e 's/\r$//g' LICENSE.txt
 
@@ -66,52 +68,28 @@ ant -Dversion=%{version} clean core
 ant -Dversion=%{version} generator
 ant -Dversion=%{version} library bigjar javadoc
 
-# inject OSGi manifests
-mkdir -p META-INF
-cp -p %{SOURCE5} META-INF/MANIFEST.MF
-touch META-INF/MANIFEST.MF
-zip -u build/%{oname}-core-%{version}.jar META-INF/MANIFEST.MF
+%mvn_artifact %{SOURCE1} build/%{oname}-library-%{version}.jar
+%mvn_artifact %{SOURCE2} build/%{oname}-generator-%{version}.jar
+%mvn_artifact %{SOURCE3} build/%{oname}-core-%{version}.jar
+%mvn_artifact %{SOURCE4} build/%{oname}-all-%{version}.jar
 
 %install
-# jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/%{name}
-install -d -m 755 $RPM_BUILD_ROOT%{_mavenpomdir}
+%mvn_install -J build/javadoc
 
-install -m 644 build/%{oname}-all-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}/all.jar
-install -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_mavenpomdir}/JPP.%{name}-all.pom
-%add_maven_depmap JPP.%{name}-all.pom %{name}/all.jar
-
-install -m 644 build/%{oname}-core-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}/core.jar
-install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_mavenpomdir}/JPP.%{name}-core.pom
-%add_maven_depmap JPP.%{name}-core.pom %{name}/core.jar
-
-install -m 644 build/%{oname}-generator-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}/generator.jar
-install -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_mavenpomdir}/JPP.%{name}-generator.pom
-%add_maven_depmap JPP.%{name}-generator.pom %{name}/generator.jar
-
-install -m 644 build/%{oname}-library-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}/library.jar
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_mavenpomdir}/JPP.%{name}-library.pom
-%add_maven_depmap JPP.%{name}-library.pom %{name}/library.jar
-
-# javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-cp -pr build/javadoc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-
-%files
+%files -f .mfiles
 %doc LICENSE.txt
 %dir %{_javadir}/%{name}
-%{_javadir}/%{name}/all.jar
-%{_javadir}/%{name}/core.jar
-%{_javadir}/%{name}/generator.jar
-%{_javadir}/%{name}/library.jar
-%{_mavenpomdir}/*
-%{_mavendepmapfragdir}/*
 
-%files javadoc
+%files javadoc -f .mfiles-javadoc
 %doc LICENSE.txt
-%{_javadocdir}/%{name}
 
 %changelog
+* Tue Mar 18 2014 Michael Simacek <msimacek@redhat.com> - 0:1.2-8
+- Use mvn_install for installation
+- Generate compat provides (resolves rhbz#1059216)
+- Drop manifest (duplicate OSGi provides)
+- Change R java to java-headless
+
 * Thu Jul 25 2013 Alexander Kurtakov <akurtako@redhat.com> 0:1.2-7
 - Build against easymock3.
 
