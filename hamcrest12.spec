@@ -3,7 +3,7 @@
 
 Name:           hamcrest12
 Version:        1.2
-Release:        9.2
+Release:        9.3
 Epoch:          0
 Summary:        Library of matchers for building test expressions
 Group:		Development/Java
