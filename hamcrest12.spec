@@ -8,7 +8,7 @@ Epoch:          0
 Summary:        Library of matchers for building test expressions
 Group:		Development/Java
 License:        BSD
-URL:            http://code.google.com/p/hamcrest/
+URL:            https://code.google.com/p/hamcrest/
 
 Source0:        http://hamcrest.googlecode.com/files/hamcrest-1.2.tgz
 Source1:        http://repo1.maven.org/maven2/org/hamcrest/hamcrest-library/1.2/hamcrest-library-1.2.pom
